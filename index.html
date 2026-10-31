@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#005DAA">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="USD→CAD">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>USD → CAD (RBC Visa)</title>
 <style>
   :root {
@@ -188,6 +194,7 @@ async function loadRate() {
       const { rate, when } = await src();
       if (rate > 0) {
         marketRate = rate;
+        $("status").classList.remove("err");
         localStorage.setItem("fx-last", JSON.stringify({ rate, when }));
         $("status").textContent = `Market rate 1 USD = ${rate.toFixed(4)} CAD · updated ${when.toLocaleString("en-CA", { dateStyle: "medium", timeStyle: "short" })}`;
         calc(); return;
@@ -206,6 +213,12 @@ async function loadRate() {
 }
 loadRate();
 $("usd").focus();
+
+// Refresh the rate when the app comes back to the foreground.
+document.addEventListener("visibilitychange", () => { if (!document.hidden) loadRate(); });
+window.addEventListener("online", loadRate);
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 </script>
 </body>
 </html>
