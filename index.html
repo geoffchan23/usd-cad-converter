@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#005DAA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>USD → CAD (RBC Visa)</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --card: #fff; --text: #14181f; --muted: #6b7380;
+    --line: #e3e7ee; --accent: #005DAA; --accent-soft: #e6f0fa; --warn: #b4560a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0e1116; --card: #181c23; --text: #eef1f5; --muted: #98a1ae;
+      --line: #2a303a; --accent: #5aa7f0; --accent-soft: #1a2a3c; --warn: #f0a35a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  main { max-width: 460px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 4px 0 2px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .amount { display: flex; align-items: center; gap: 8px; border: 2px solid var(--accent);
+    border-radius: 12px; padding: 4px 12px; }
+  .amount span { font-size: 28px; color: var(--muted); }
+  .amount input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text);
+    font-size: 36px; font-weight: 600; padding: 6px 0; }
+  .amount small { font-weight: 600; color: var(--muted); }
+  .total { background: var(--accent-soft); border-color: transparent; text-align: center; }
+  .total .big { font-size: 44px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+  .total .eff { color: var(--muted); font-size: 14px; }
+  .row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 15px; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row .k { color: var(--muted); }
+  .row .v { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .settings input { width: 100%; font-size: 17px; padding: 10px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .status { font-size: 12px; color: var(--muted); text-align: center; margin: 4px 0 12px; }
+  .status.err { color: var(--warn); }
+  details summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+  details p { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+  button { font: inherit; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .chips button { border: 1px solid var(--line); background: var(--bg); color: var(--text);
+    border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>USD → CAD on RBC Visa</h1>
+  <div class="sub">What a US-dollar price actually costs on your RBC Visa card</div>
+
+  <div class="card">
+    <label for="usd">Price in US dollars</label>
+    <div class="amount">
+      <span>$</span>
+      <input id="usd" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+      <small>USD</small>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="card total">
+    <div class="eff">You'll actually pay about</div>
+    <div class="big" id="total">$0.00</div>
+    <div class="eff" id="effRate">CAD</div>
+  </div>
+  <div class="status" id="status">Loading today's rate…</div>
+
+  <div class="card">
+    <div class="row"><span class="k">US price</span><span class="v" id="bUsd">—</span></div>
+    <div class="row"><span class="k">+ US sales tax</span><span class="v" id="bTax">—</span></div>
+    <div class="row"><span class="k">At market rate</span><span class="v" id="bMid">—</span></div>
+    <div class="row"><span class="k">+ Visa rate spread</span><span class="v" id="bVisa">—</span></div>
+    <div class="row"><span class="k">+ RBC foreign transaction fee</span><span class="v" id="bRbc">—</span></div>
+    <div class="row"><span class="k"><b>Total in CAD</b></span><span class="v"><b id="bTotal">—</b></span></div>
+  </div>
+
+  <div class="card">
+    <div class="settings">
+      <div>
+        <label for="rbcFee">RBC FX fee %</label>
+        <input id="rbcFee" type="text" inputmode="decimal">
+        <div class="hint">Most RBC Visas: 2.5%</div>
+      </div>
+      <div>
+        <label for="visaSpread">Visa spread %</label>
+        <input id="visaSpread" type="text" inputmode="decimal">
+        <div class="hint">Visa vs. market rate, usually small</div>
+      </div>
+      <div>
+        <label for="tax">US sales tax %</label>
+        <input id="tax" type="text" inputmode="decimal">
+        <div class="hint">0 if price already includes it</div>
+      </div>
+      <div>
+        <label for="rateOverride">Rate override</label>
+        <input id="rateOverride" type="text" inputmode="decimal" placeholder="auto">
+        <div class="hint">Blank = live market rate</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>How this is calculated</summary>
+      <p>RBC Visa cards convert US-dollar purchases at the Visa network rate and then add a foreign
+        transaction fee (2.5% on most RBC credit cards). The market rate is loaded live and refreshed
+        daily. Visa's own published rate is usually within a few tenths of a percent of it.</p>
+      <p>Your exact rate is set on the day the charge posts, not the day you buy, so treat
+        this as a close estimate. Check your card's terms if you're unsure of its fee. Some cards charge 0%.</p>
+      <p>Your settings are saved on this phone.</p>
+    </details>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const DEFAULTS = { rbcFee: "2.5", visaSpread: "0.2", tax: "0", rateOverride: "" };
+const fields = Object.keys(DEFAULTS);
+const saved = JSON.parse(localStorage.getItem("fx-settings") || "{}");
+fields.forEach(f => { $(f).value = saved[f] ?? DEFAULTS[f]; });
+
+let marketRate = null;
+const num = v => { const n = parseFloat(String(v).replace(/[^0-9.]/g, "")); return isFinite(n) ? n : 0; };
+const cad = n => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usd = n => "US$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function calc() {
+  const override = num($("rateOverride").value);
+  const mid = override > 0 ? override : marketRate;
+  const price = num($("usd").value);
+  const taxPct = num($("tax").value), visaPct = num($("visaSpread").value), rbcPct = num($("rbcFee").value);
+
+  const taxUsd = price * taxPct / 100;
+  const subUsd = price + taxUsd;
+  if (!mid) return;
+  const atMid = subUsd * mid;
+  const visaRate = mid * (1 + visaPct / 100);
+  const atVisa = subUsd * visaRate;
+  const rbc = atVisa * rbcPct / 100;
+  const total = atVisa + rbc;
+  const effRate = visaRate * (1 + rbcPct / 100);
+
+  $("total").textContent = cad(total);
+  $("effRate").textContent = `CAD · effective rate ${effRate.toFixed(4)} (market ${mid.toFixed(4)})`;
+  $("bUsd").textContent = usd(price);
+  $("bTax").textContent = usd(taxUsd);
+  $("bMid").textContent = cad(atMid);
+  $("bVisa").textContent = cad(atVisa - atMid);
+  $("bRbc").textContent = cad(rbc);
+  $("bTotal").textContent = cad(total);
+}
+
+fields.forEach(f => $(f).addEventListener("input", () => {
+  const s = {}; fields.forEach(k => s[k] = $(k).value);
+  localStorage.setItem("fx-settings", JSON.stringify(s));
+  calc();
+}));
+$("usd").addEventListener("input", calc);
+
+[10, 25, 50, 100, 250].forEach(v => {
+  const b = document.createElement("button");
+  b.textContent = "$" + v;
+  b.onclick = () => { $("usd").value = v; calc(); };
+  $("chips").appendChild(b);
+});
+
+async function loadRate() {
+  const sources = [
+    async () => {
+      const r = await fetch("https://open.er-api.com/v6/latest/USD"); const d = await r.json();
+      return { rate: d.rates.CAD, when: new Date(d.time_last_update_unix * 1000) };
+    },
+    async () => {
+      const r = await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.min.json");
+      const d = await r.json(); return { rate: d.usd.cad, when: new Date(d.date + "T00:00:00Z") };
+    },
+  ];
+  for (const src of sources) {
+    try {
+      const { rate, when } = await src();
+      if (rate > 0) {
+        marketRate = rate;
+        localStorage.setItem("fx-last", JSON.stringify({ rate, when }));
+        $("status").textContent = `Market rate 1 USD = ${rate.toFixed(4)} CAD · updated ${when.toLocaleString("en-CA", { dateStyle: "medium", timeStyle: "short" })}`;
+        calc(); return;
+      }
+    } catch (e) { /* try next source */ }
+  }
+  const last = JSON.parse(localStorage.getItem("fx-last") || "null");
+  if (last) {
+    marketRate = last.rate;
+    $("status").textContent = `Offline: using last saved rate ${last.rate.toFixed(4)} from ${new Date(last.when).toLocaleDateString("en-CA")}`;
+  } else {
+    $("status").textContent = "Couldn't load the rate. Enter one under Rate override.";
+  }
+  $("status").classList.add("err");
+  calc();
+}
+loadRate();
+$("usd").focus();
+</script>
+</body>
+</html>
