@@ -46,27 +46,54 @@
   /* Wallet reaction: part of the result card, same type as the rest of the app */
   .react { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 12px;
     border-top: 1px solid var(--line); cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
-  .react svg { width: 66px; flex: none; overflow: visible; }
+  .react svg { width: 112px; flex: none; overflow: visible; color: var(--text); }
   .react .quip { flex: 1; font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--text); }
 
-  /* Wallet moods */
-  #walt .eyes > g, #walt .sweat, #walt .zzz, #walt .bill-fly { display: none; }
-  #walt[data-mood="sleep"] .e-closed, #walt[data-mood="sleep"] .zzz { display: inline; }
-  #walt[data-mood="happy"] .e-happy { display: inline; }
-  #walt[data-mood="side"] .e-side { display: inline; }
-  #walt[data-mood="nervous"] .e-open, #walt[data-mood="nervous"] .s1 { display: inline; }
-  #walt[data-mood="panic"] .e-wide, #walt[data-mood="panic"] .sweat { display: inline; }
-  #walt[data-mood="dead"] .e-x, #walt[data-mood="dead"] .bill-fly { display: inline; }
-  #walt[data-mood="dead"] .bill { display: none; }
-  #walt[data-mood="panic"] .body { animation: shake .35s infinite; transform-origin: 60px 80px; }
-  #walt[data-mood="sleep"] .body { animation: breathe 3s ease-in-out infinite; transform-origin: 60px 95px; }
-  #walt .bill-fly { animation: fly 1.6s ease-in infinite; }
+  /* Wallet moods, mildly concerned to cartoonishly deceased.
+     Each element is hidden unless its mood says otherwise. */
+  #walt .m { display: none; }
+  #walt[data-mood="sleep"]   .m-sleep,
+  #walt[data-mood="happy"]   .m-happy,
+  #walt[data-mood="side"]    .m-side,
+  #walt[data-mood="nervous"] .m-nervous,
+  #walt[data-mood="panic"]   .m-panic,
+  #walt[data-mood="cut"]     .m-cut,
+  #walt[data-mood="split"]   .m-split,
+  #walt[data-mood="ghost"]   .m-ghost { display: inline; }
+  #walt * { transform-box: fill-box; }
+
+  #walt[data-mood="sleep"] .whole  { animation: breathe 3s ease-in-out infinite; transform-origin: 50% 100%; }
+  #walt[data-mood="happy"] .whole  { animation: hop .9s ease-in-out infinite; }
+  #walt[data-mood="nervous"] .whole { animation: shake .5s linear infinite; transform-origin: 50% 100%; }
+  #walt[data-mood="panic"] .whole  { animation: shake .18s linear infinite; transform-origin: 50% 100%; }
+  #walt[data-mood="cut"] .whole    { animation: shake .9s linear infinite; transform-origin: 50% 100%; }
+  #walt .sweat { animation: drip 1.1s ease-in infinite; }
+  #walt .sweat.d2 { animation-delay: .5s; }
+  #walt .blood { animation: drip 1.3s ease-in infinite; }
+  #walt .blood.d2 { animation-delay: .45s; } #walt .blood.d3 { animation-delay: .9s; }
+  #walt[data-mood="panic"] .card-in { animation: stalk 1s ease-in-out infinite; }
+  #walt[data-mood="cut"] .card-in { animation: slash 1.4s ease-in-out infinite; transform-origin: 0% 100%; }
+  #walt[data-mood="split"] .card-in { animation: rise 1.2s ease-in-out infinite; }
+  #walt .hl { transform: translate(-4px, 2px) rotate(-7deg); transform-origin: 0% 100%; }
+  #walt .hr { transform: translate(4px, 2px) rotate(7deg); transform-origin: 100% 100%; }
+  #walt[data-mood="split"] .hl-in { animation: wobble 1.6s ease-in-out infinite; transform-origin: 0% 100%; }
+  #walt[data-mood="split"] .hr-in { animation: wobble 1.6s ease-in-out infinite reverse; transform-origin: 100% 100%; }
+  #walt[data-mood="ghost"] .hl { transform: translate(-3px, 18px) rotate(-14deg); }
+  #walt[data-mood="ghost"] .hr { transform: translate(3px, 18px) rotate(14deg); }
+  #walt .spring { animation: boing .7s ease-in-out infinite; transform-origin: 50% 100%; }
+  #walt .spook { animation: rise 2.4s ease-in-out infinite; }
   .pop { animation: pop .3s ease-out; }
+  @keyframes breathe { 0%,100% { transform: scaleY(1) } 50% { transform: scaleY(.96) } }
+  @keyframes hop { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
   @keyframes shake { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-3deg) } 75% { transform: rotate(3deg) } }
-  @keyframes breathe { 0%,100% { transform: scaleY(1) } 50% { transform: scaleY(.97) } }
-  @keyframes fly { 0% { transform: translate(0,0) rotate(0); opacity: 1 } 100% { transform: translate(40px,-60px) rotate(40deg); opacity: 0 } }
-  @keyframes pop { 0% { transform: scale(.92) } 60% { transform: scale(1.03) } 100% { transform: scale(1) } }
-  @media (prefers-reduced-motion: reduce) { #walt * , .pop { animation: none !important; } }
+  @keyframes drip { 0% { transform: translateY(0); opacity: 1 } 100% { transform: translateY(18px); opacity: 0 } }
+  @keyframes stalk { 0%,100% { transform: translate(0,0) rotate(0) } 50% { transform: translate(-9px,5px) rotate(-8deg) } }
+  @keyframes slash { 0%,100% { transform: rotate(0) } 40% { transform: rotate(-28deg) } 55% { transform: rotate(6deg) } }
+  @keyframes wobble { 0%,100% { transform: rotate(0) } 50% { transform: rotate(-4deg) } }
+  @keyframes boing { 0%,100% { transform: scaleY(1) } 30% { transform: scaleY(.55) } 60% { transform: scaleY(1.12) } }
+  @keyframes rise { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+  @keyframes pop { 0% { transform: scale(.9) } 60% { transform: scale(1.05) } 100% { transform: scale(1) } }
+  @media (prefers-reduced-motion: reduce) { #walt *, .pop { animation: none !important; } }
 
   /* Details (everything that isn't the core flow) */
   details.more { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
@@ -100,33 +127,111 @@
       <div class="eff" id="status">Loading today's rate…</div>
     </div>
     <div class="react" id="comic" role="button" aria-label="Wallet's reaction. Tap for another.">
-      <svg id="walt" data-mood="sleep" viewBox="0 0 120 110" aria-hidden="true">
-        <g class="body">
-          <g class="bill"><rect x="26" y="20" width="56" height="26" rx="2" fill="#7fc47f" stroke="#1c1c1c" stroke-width="2.5"/>
-            <circle cx="54" cy="33" r="6" fill="none" stroke="#1c1c1c" stroke-width="2"/></g>
-          <rect x="8" y="34" width="104" height="68" rx="12" fill="#a5672f" stroke="#1c1c1c" stroke-width="3"/>
-          <path d="M8 52 H112" stroke="#1c1c1c" stroke-width="2.5" stroke-dasharray="5 4" opacity=".5"/>
-          <rect x="88" y="58" width="24" height="16" rx="5" fill="#c98a4b" stroke="#1c1c1c" stroke-width="2.5"/>
-          <circle cx="97" cy="66" r="3" fill="#ffd23f" stroke="#1c1c1c" stroke-width="1.5"/>
-          <g class="eyes" stroke="#1c1c1c" stroke-width="3" stroke-linecap="round" fill="none">
-            <g class="e-closed"><path d="M30 68 q7 5 14 0"/><path d="M56 68 q7 5 14 0"/></g>
-            <g class="e-happy"><path d="M30 70 q7 -8 14 0"/><path d="M56 70 q7 -8 14 0"/></g>
-            <g class="e-side"><path d="M29 64 h16"/><path d="M55 64 h16"/>
-              <circle cx="41" cy="68" r="3.5" fill="#1c1c1c"/><circle cx="67" cy="68" r="3.5" fill="#1c1c1c"/></g>
-            <g class="e-open"><circle cx="37" cy="67" r="6" fill="#fff"/><circle cx="63" cy="67" r="6" fill="#fff"/>
-              <circle cx="37" cy="68" r="2.5" fill="#1c1c1c"/><circle cx="63" cy="68" r="2.5" fill="#1c1c1c"/>
-              <path d="M30 59 l12 -4"/><path d="M70 59 l-12 -4"/></g>
-            <g class="e-wide"><circle cx="37" cy="66" r="9" fill="#fff"/><circle cx="63" cy="66" r="9" fill="#fff"/>
-              <circle cx="37" cy="66" r="2" fill="#1c1c1c"/><circle cx="63" cy="66" r="2" fill="#1c1c1c"/></g>
-            <g class="e-x"><path d="M31 61 l12 12 M43 61 l-12 12"/><path d="M57 61 l12 12 M69 61 l-12 12"/></g>
+      <svg id="walt" data-mood="sleep" viewBox="0 -34 160 186" aria-hidden="true">
+        <defs>
+          <g id="wbody">
+            <rect x="20" y="40" width="120" height="80" rx="14" fill="#a5672f" stroke="#1c1c1c" stroke-width="3"/>
+            <path d="M20 58 H140" stroke="#1c1c1c" stroke-width="2.5" stroke-dasharray="5 4" opacity=".5"/>
+            <rect x="116" y="66" width="24" height="18" rx="5" fill="#c98a4b" stroke="#1c1c1c" stroke-width="2.5"/>
+            <circle cx="126" cy="75" r="3" fill="#ffd23f" stroke="#1c1c1c" stroke-width="1.5"/>
           </g>
-          <path id="mouth" d="M44 86 h12" stroke="#1c1c1c" stroke-width="3" stroke-linecap="round" fill="none"/>
-          <path class="sweat s1" d="M16 58 q-5 9 0 11 q5 -2 0 -11z" fill="#7cc6ff" stroke="#1c1c1c" stroke-width="1.5"/>
-          <path class="sweat" d="M80 44 q-5 9 0 11 q5 -2 0 -11z" fill="#7cc6ff" stroke="#1c1c1c" stroke-width="1.5"/>
+          <clipPath id="cutL"><polygon points="0,-40 80,-40 72,60 86,82 76,150 0,150"/></clipPath>
+          <clipPath id="cutR"><polygon points="80,-40 170,-40 170,150 76,150 86,82 72,60"/></clipPath>
+          <g id="cardShape">
+            <rect x="0" y="0" width="46" height="30" rx="4" fill="#2f6fd6" stroke="#1c1c1c" stroke-width="2.5"/>
+            <rect x="1.5" y="6" width="43" height="6" fill="#1c1c1c"/>
+            <rect x="6" y="16" width="9" height="7" rx="1.5" fill="#ffd23f" stroke="#1c1c1c" stroke-width="1"/>
+          </g>
+        </defs>
+
+        <!-- Intact wallet: sleep through cut -->
+        <g class="m m-sleep m-happy m-side m-nervous m-panic m-cut">
+          <g class="whole">
+            <g class="m m-sleep m-happy m-side m-nervous m-panic">
+              <rect x="50" y="24" width="60" height="26" rx="2" fill="#7fc47f" stroke="#1c1c1c" stroke-width="2.5"/>
+              <circle cx="80" cy="37" r="6" fill="none" stroke="#1c1c1c" stroke-width="2"/>
+            </g>
+            <use href="#wbody"/>
+            <g stroke="#1c1c1c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <g class="m m-sleep"><path d="M52 80 q8 6 16 0"/><path d="M88 80 q8 6 16 0"/></g>
+              <g class="m m-happy"><path d="M52 83 q8 -9 16 0"/><path d="M88 83 q8 -9 16 0"/></g>
+              <g class="m m-side"><path d="M51 75 h18"/><path d="M87 75 h18"/>
+                <circle cx="65" cy="80" r="4" fill="#1c1c1c"/><circle cx="101" cy="80" r="4" fill="#1c1c1c"/></g>
+              <g class="m m-nervous"><circle cx="60" cy="80" r="7" fill="#fff"/><circle cx="96" cy="80" r="7" fill="#fff"/>
+                <circle cx="60" cy="81" r="2.8" fill="#1c1c1c"/><circle cx="96" cy="81" r="2.8" fill="#1c1c1c"/>
+                <path d="M52 69 L66 64"/><path d="M104 69 L90 64"/></g>
+              <g class="m m-panic"><circle cx="60" cy="79" r="10" fill="#fff"/><circle cx="96" cy="79" r="10" fill="#fff"/>
+                <circle cx="60" cy="79" r="2" fill="#1c1c1c"/><circle cx="96" cy="79" r="2" fill="#1c1c1c"/></g>
+              <g class="m m-cut"><path d="M54 74 l11 6 l-11 6"/>
+                <circle cx="96" cy="79" r="11" fill="#fff"/><circle cx="96" cy="79" r="2" fill="#1c1c1c"/></g>
+              <path id="mouth" d="M74 102 h10"/>
+            </g>
+            <!-- sweat -->
+            <path class="m m-nervous m-panic sweat" d="M28 60 q-5 9 0 11 q5 -2 0 -11z" fill="#7cc6ff" stroke="#1c1c1c" stroke-width="1.5"/>
+            <path class="m m-panic sweat d2" d="M112 46 q-5 9 0 11 q5 -2 0 -11z" fill="#7cc6ff" stroke="#1c1c1c" stroke-width="1.5"/>
+            <!-- the wound -->
+            <g class="m m-cut">
+              <path d="M30 114 L44 98 L52 106 L66 90 L74 98 L90 84" fill="none" stroke="#e0262b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M30 114 L44 98 L52 106 L66 90 L74 98 L90 84" fill="none" stroke="#7a0f12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle class="blood" cx="44" cy="104" r="3" fill="#e0262b"/>
+              <circle class="blood d2" cx="66" cy="96" r="3" fill="#e0262b"/>
+              <circle class="blood d3" cx="36" cy="116" r="3" fill="#e0262b"/>
+            </g>
+            <text class="m m-sleep" x="122" y="34" font-size="16" font-weight="700" fill="currentColor" stroke="none">z<tspan dx="2" dy="-8" font-size="20">Z</tspan></text>
+          </g>
         </g>
-        <g class="bill-fly"><rect x="30" y="16" width="44" height="20" rx="2" fill="#7fc47f" stroke="#1c1c1c" stroke-width="2.5"/>
-          <path d="M18 22 q4 -6 8 0 M74 10 q4 -6 8 0" stroke="#1c1c1c" stroke-width="2" fill="none"/></g>
-        <text class="zzz" x="88" y="26" font-size="16" font-weight="700" fill="#1c1c1c">z<tspan dx="2" dy="-8" font-size="20">Z</tspan></text>
+
+        <!-- Sliced in two: split and ghost -->
+        <g class="m m-split m-ghost">
+          <ellipse class="m m-ghost" cx="80" cy="134" rx="66" ry="7" fill="#e0262b" stroke="#1c1c1c" stroke-width="2"/>
+          <g class="hl"><g class="hl-in">
+            <use href="#wbody" clip-path="url(#cutL)"/>
+            <path d="M80 40 L72 60 L86 82 L76 120" fill="none" stroke="#e0262b" stroke-width="4" stroke-linejoin="round" clip-path="url(#cutL)"/>
+            <g stroke="#1c1c1c" stroke-width="3" stroke-linecap="round"><path d="M54 74 l12 12 M66 74 l-12 12"/></g>
+            <path d="M50 104 q8 -4 14 0" stroke="#1c1c1c" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g></g>
+          <g class="hr"><g class="hr-in">
+            <use href="#wbody" clip-path="url(#cutR)"/>
+            <path d="M80 40 L72 60 L86 82 L76 120" fill="none" stroke="#e0262b" stroke-width="4" stroke-linejoin="round" clip-path="url(#cutR)"/>
+            <circle cx="98" cy="80" r="8" fill="#4a2208" stroke="#1c1c1c" stroke-width="2"/>
+            <g class="m m-split spring">
+              <path d="M98 80 l-5 -5 l10 -5 l-10 -5 l10 -5 l-10 -5 l10 -5 l-5 -4" fill="none" stroke="#1c1c1c" stroke-width="2"/>
+              <circle cx="98" cy="38" r="9" fill="#fff" stroke="#1c1c1c" stroke-width="2.5"/>
+              <circle cx="100" cy="39" r="3" fill="#1c1c1c"/>
+            </g>
+          </g></g>
+          <g class="m m-split">
+            <circle class="blood" cx="80" cy="104" r="3.5" fill="#e0262b"/>
+            <circle class="blood d2" cx="78" cy="88" r="3" fill="#e0262b"/>
+            <circle class="blood d3" cx="82" cy="116" r="3" fill="#e0262b"/>
+          </g>
+          <g class="m m-ghost" fill="#ffd23f" stroke="#1c1c1c" stroke-width="1.5">
+            <circle cx="22" cy="132" r="5"/><circle cx="136" cy="130" r="5"/><circle cx="146" cy="136" r="4"/>
+          </g>
+          <!-- the wallet's ghost -->
+          <g class="m m-ghost spook">
+            <ellipse cx="80" cy="-24" rx="18" ry="5" fill="none" stroke="#e8b923" stroke-width="3"/>
+            <path d="M54 -14 h52 a8 8 0 0 1 8 8 v34 l-8 -6 l-8 6 l-8 -6 l-8 6 l-8 -6 l-8 6 l-8 -6 l-8 6 l-8 -6 v-34 a8 8 0 0 1 8 -8z"
+              fill="#fff" fill-opacity=".85" stroke="#1c1c1c" stroke-width="2.5" stroke-linejoin="round"/>
+            <g stroke="#1c1c1c" stroke-width="2.5" stroke-linecap="round" fill="none">
+              <path d="M66 4 q5 4 10 0"/><path d="M84 4 q5 4 10 0"/><path d="M74 14 q6 5 12 0"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- The credit card, which has decided to get involved -->
+        <g class="m m-panic m-cut" transform="translate(112 2) rotate(24)">
+          <g class="card-in">
+            <use href="#cardShape"/>
+            <path class="m m-cut m-split" d="M0 26 q4 -6 2 -14 q6 4 6 14 q-2 4 -8 4z" fill="#e0262b"/>
+          </g>
+        </g>
+        <g class="m m-split" transform="translate(10 -22) rotate(-24)">
+          <g class="card-in">
+            <use href="#cardShape"/>
+            <path d="M46 4 q-4 6 -2 14 q-6 -4 -6 -14 q2 -4 8 -4z" fill="#e0262b"/>
+          </g>
+        </g>
       </svg>
       <div class="quip" id="quip" aria-live="polite"></div>
     </div>
@@ -178,30 +283,30 @@ const usd = n => "US$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, m
 
 // ---- The wallet's reaction, by how much CAD is about to leave ----
 const TIERS = [
-  { max: 0, mood: "sleep", mouth: "M50 88 h10", lines: [
+  { max: 0, mood: "sleep", mouth: "M74 102 h10", lines: [
     "Wallet's asleep. Let's keep it that way.",
-    "Type a price. I'll try not to judge.",
-    "Nothing spent yet. Peak performance." ] },
-  { max: 15, mood: "happy", mouth: "M46 84 q10 9 20 0", lines: [
+    "Type a price. I'll try not to judge." ] },
+  { max: 10, mood: "happy", mouth: "M68 98 q10 10 22 0", lines: [
     "Snack money. Approved.",
-    "Barely felt it.",
-    "Fine. Live a little." ] },
-  { max: 75, mood: "side", mouth: "M46 88 q8 -4 18 -2", lines: [
+    "Barely felt it." ] },
+  { max: 25, mood: "side", mouth: "M68 103 q10 -4 20 -2", lines: [
     "Is this a need, or a “need”?",
-    "Will you still love it on Thursday?",
-    "Adding to cart is not a personality." ] },
-  { max: 250, mood: "nervous", mouth: "M44 88 q4 -4 8 0 q4 4 8 0 q4 -4 8 0", lines: [
-    "Sleep on it. The cart will wait.",
-    "Your savings account just flinched.",
-    "Bold. Very bold." ] },
-  { max: 1000, mood: "panic", mouth: "M47 86 a8 7 0 1 0 16 0 a8 7 0 1 0 -16 0", lines: [
-    "Put the phone down. Slowly.",
-    "Have you run this by the boss?",
-    "Have you met our budget?" ] },
-  { max: Infinity, mood: "dead", mouth: "M44 90 h22", lines: [
-    "I'm not mad. I'm just empty.",
+    "Will you still love it on Thursday?" ] },
+  { max: 50, mood: "nervous", mouth: "M66 103 q4 -4 8 0 q4 4 8 0 q4 -4 8 0", lines: [
+    "I'm fine. This is fine. Totally fine.",
+    "Your savings account just flinched." ] },
+  { max: 80, mood: "panic", mouth: "M71 101 a7 7 0 1 0 14 0 a7 7 0 1 0 -14 0", lines: [
+    "Why is the credit card looking at me like that?",
+    "PUT. THE PHONE. DOWN." ] },
+  { max: 120, mood: "cut", mouth: "M64 104 l6 -5 l6 5 l6 -5 l6 5 l6 -5", lines: [
+    "It's just a flesh wound. A very expensive flesh wound.",
+    "Is that… is that my lining?" ] },
+  { max: 160, mood: "split", lines: [
+    "I can see my own receipts.",
+    "Which half of me are you spending?" ] },
+  { max: Infinity, mood: "ghost", lines: [
     "Tell my coins I loved them.",
-    "We're going to need a bigger paycheque." ] },
+    "I'm in a better place now. It has no checkout button." ] },
 ];
 let tierIdx = -1, lineIdx = 0;
 
@@ -212,7 +317,7 @@ function updateComic(total, force) {
   lineIdx = force ? (lineIdx + 1) % t.lines.length : Math.floor(Math.random() * t.lines.length);
   tierIdx = i;
   $("walt").dataset.mood = t.mood;
-  $("mouth").setAttribute("d", t.mouth);
+  if (t.mouth) $("mouth").setAttribute("d", t.mouth);
   $("quip").textContent = t.lines[lineIdx];
   const w = $("walt"); w.classList.remove("pop"); void w.getBoundingClientRect(); w.classList.add("pop");
 }
