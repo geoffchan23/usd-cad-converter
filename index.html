@@ -16,12 +16,10 @@
   :root {
     --bg: #f4f6f9; --card: #fff; --text: #14181f; --muted: #6b7380;
     --line: #e3e7ee; --accent: #005DAA; --accent-soft: #e6f0fa; --warn: #b4560a;
-    --ink: #1c1c1c; --paper: #fffdf3; --dot: #f2e7c4; --shadow: #1c1c1c;
   }
   @media (prefers-color-scheme: dark) {
     :root { --bg: #0e1116; --card: #181c23; --text: #eef1f5; --muted: #98a1ae;
-      --line: #2a303a; --accent: #5aa7f0; --accent-soft: #1a2a3c; --warn: #f0a35a;
-      --paper: #f6f0dc; --dot: #e6d9ad; --shadow: #3d4656; }
+      --line: #2a303a; --accent: #5aa7f0; --accent-soft: #1a2a3c; --warn: #f0a35a; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -45,25 +43,11 @@
   .result .eff { color: var(--muted); font-size: 13px; margin-top: 4px; }
   .result .eff.err { color: var(--warn); }
 
-  /* The comic */
-  .comic { position: relative; background: var(--paper); border: 3px solid var(--ink); border-radius: 6px;
-    box-shadow: 5px 5px 0 var(--shadow); margin: 6px 4px 22px; padding: 12px 12px 10px; color: var(--ink);
-    background-image: radial-gradient(var(--dot) 1.2px, transparent 1.3px); background-size: 9px 9px;
-    font-family: "Chalkboard SE", "Comic Neue", "Comic Sans MS", "Marker Felt", ui-rounded, sans-serif;
-    cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
-  .comic .tag { position: absolute; top: -12px; left: 12px; background: #ffd23f; border: 2px solid var(--ink);
-    font-size: 11px; font-weight: 700; letter-spacing: .5px; padding: 1px 8px; text-transform: uppercase; transform: rotate(-2deg); }
-  .comic .scene { display: flex; align-items: flex-end; gap: 6px; }
-  .comic svg { width: 116px; flex: none; overflow: visible; }
-  .bubble { position: relative; flex: 1; background: #fff; border: 2.5px solid var(--ink); border-radius: 18px;
-    padding: 10px 12px; font-size: 17px; font-weight: 700; line-height: 1.25; margin-bottom: 46px; min-height: 58px; }
-  .bubble::before, .bubble::after { content: ""; position: absolute; left: -14px; bottom: 10px;
-    border-style: solid; border-width: 8px 16px 8px 0; border-color: transparent var(--ink) transparent transparent; }
-  .bubble::after { left: -9.5px; bottom: 11.5px; border-width: 6.5px 13px 6.5px 0; border-color: transparent #fff transparent transparent; }
-  .caption { border-top: 2px dashed var(--ink); margin-top: 6px; padding-top: 7px; text-align: center; }
-  .caption .saying { font-size: 15px; font-weight: 700; font-style: italic; }
-  .caption .gloss { font-size: 12px; opacity: .65; margin-top: 2px; }
-  .reroll { position: absolute; right: 8px; bottom: -20px; font-size: 11px; color: var(--muted); font-family: inherit; }
+  /* Wallet reaction: part of the result card, same type as the rest of the app */
+  .react { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--line); cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .react svg { width: 66px; flex: none; overflow: visible; }
+  .react .quip { flex: 1; font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--text); }
 
   /* Wallet moods */
   #walt .eyes > g, #walt .sweat, #walt .zzz, #walt .bill-fly { display: none; }
@@ -115,11 +99,7 @@
       <div class="big"><span id="total">$0.00</span> <small>CAD</small></div>
       <div class="eff" id="status">Loading today's rate…</div>
     </div>
-  </div>
-
-  <div class="comic" id="comic" role="button" aria-label="Wallet commentary, tap for another line">
-    <div class="tag">Yuh wallet seh</div>
-    <div class="scene">
+    <div class="react" id="comic" role="button" aria-label="Wallet's reaction. Tap for another.">
       <svg id="walt" data-mood="sleep" viewBox="0 0 120 110" aria-hidden="true">
         <g class="body">
           <g class="bill"><rect x="26" y="20" width="56" height="26" rx="2" fill="#7fc47f" stroke="#1c1c1c" stroke-width="2.5"/>
@@ -148,10 +128,8 @@
           <path d="M18 22 q4 -6 8 0 M74 10 q4 -6 8 0" stroke="#1c1c1c" stroke-width="2" fill="none"/></g>
         <text class="zzz" x="88" y="26" font-size="16" font-weight="700" fill="#1c1c1c">z<tspan dx="2" dy="-8" font-size="20">Z</tspan></text>
       </svg>
-      <div class="bubble" id="quip">Zzz…</div>
+      <div class="quip" id="quip" aria-live="polite"></div>
     </div>
-    <div class="caption"><div class="saying" id="saying">&nbsp;</div><div class="gloss" id="gloss"></div></div>
-    <div class="reroll">tap fuh anodda one</div>
   </div>
 
   <details class="more">
@@ -198,75 +176,45 @@ const num = v => { const n = parseFloat(String(v).replace(/[^0-9.]/g, "")); retu
 const cad = n => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const usd = n => "US$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// ---- The wallet's opinions (in Guyanese Creolese), by how much CAD is about to leave ----
-// Each tier: what the wallet says, plus a real Guyanese proverb for the caption.
+// ---- The wallet's reaction, by how much CAD is about to leave ----
 const TIERS = [
   { max: 0, mood: "sleep", mouth: "M50 88 h10", lines: [
-    "Zzz… wake me up when yuh find sumting fuh buy.",
-    "Me jus' restin' me eye. Me still watchin' yuh.",
-    "Everyting quiet. Me like it so." ], sayings: [
-    ["Cold water does cool hot iron.", "Give it time and the wanting passes."],
-    ["Tek yuh eye an pass.", "Just look. Don't buy."] ] },
+    "Wallet's asleep. Let's keep it that way.",
+    "Type a price. I'll try not to judge.",
+    "Nothing spent yet. Peak performance." ] },
   { max: 15, mood: "happy", mouth: "M46 84 q10 9 20 0", lines: [
-    "Small ting. Go 'head.",
-    "Dat is lil change. Me nah vex.",
-    "Alright, treat yuhself. But lil bit, yuh hear?",
-    "Me barely feel dat." ], sayings: [
-    ["One one dutty does mek dam.", "Little purchases add up."],
-    ["Good livin nah long life.", "Comfort isn't the same as wisdom."] ] },
+    "Snack money. Approved.",
+    "Barely felt it.",
+    "Fine. Live a little." ] },
   { max: 75, mood: "side", mouth: "M46 88 q8 -4 18 -2", lines: [
-    "*cut eye* Yuh really need dat?",
-    "Steups. Is wuh yuh buyin' now?",
-    "Is need yuh need it, or ad tell yuh fuh buy it?",
-    "Tek yuh eye an pass, nuh." ], sayings: [
-    ["All skin teeth nah laugh.", "That “sale” smiling at you is not your friend."],
-    ["Empty barrel mek de most noise.", "The loudest ads have the least behind them."],
-    ["Cat foot soft but he does scratch hard.", "Looks harmless. Hits the statement hard."] ] },
+    "Is this a need, or a “need”?",
+    "Will you still love it on Thursday?",
+    "Adding to cart is not a personality." ] },
   { max: 250, mood: "nervous", mouth: "M44 88 q4 -4 8 0 q4 4 8 0 q4 -4 8 0", lines: [
-    "Eh-eh! Money nah grow pan tree, yuh know.",
-    "Yuh hard ears, eh? Me done tell yuh.",
-    "Remember when abee was savin'? Dem was good days.",
-    "Yuh future self gon cuss yuh fuh dis." ], sayings: [
-    ["Nah put all two foot in di river if yuh want see how deep.", "Test the waters before you commit."],
-    ["When ya hand in lion mouth, tek time draw it out.", "Careful now. Back away slowly."],
-    ["If you nah hear, you guh feel.", "Ignore the warning, feel the statement."] ] },
+    "Sleep on it. The cart will wait.",
+    "Your savings account just flinched.",
+    "Bold. Very bold." ] },
   { max: 1000, mood: "panic", mouth: "M47 86 a8 7 0 1 0 16 0 a8 7 0 1 0 -16 0", lines: [
-    "Ow man! Put down de phone!",
-    "Yuh mad or wha?!",
-    "Mi nah able wid yuh!",
-    "Look how yuh hungish!" ], sayings: [
-    ["Wanti all, getti none.", "Grab for everything, end up with nothing."],
-    ["Yuh diggin hole to fill hole.", "Credit card logic."],
-    ["Wha sweet ah goat mouth does sour he backside.", "Sweet now, bitter when the bill comes."] ] },
+    "Put the phone down. Slowly.",
+    "Have you run this by the boss?",
+    "Have you met our budget?" ] },
   { max: Infinity, mood: "dead", mouth: "M44 90 h22", lines: [
-    "Wuh fuh do. Me done.",
-    "Ah deh ya… barely.",
-    "Me gon tell yuh mudda.",
-    "Leff am. Jus' leff am." ], sayings: [
-    ["After laugh come cry.", "Fun at checkout, tears at the statement."],
-    ["“If meh bin know” always deh behind di door.", "“I didn't know” won't save you now."],
-    ["Yuh gon learn, either in joke or in cry.", "This one's the cry."] ] },
+    "I'm not mad. I'm just empty.",
+    "Tell my coins I loved them.",
+    "We're going to need a bigger paycheque." ] },
 ];
-let tierIdx = -1, lineIdx = 0, sayIdx = 0;
+let tierIdx = -1, lineIdx = 0;
 
 function updateComic(total, force) {
   const i = TIERS.findIndex(t => total <= t.max);
   const t = TIERS[i];
-  if (i !== tierIdx || force) {
-    const pick = (arr, prev) => force && arr.length > 1
-      ? (prev + 1 + Math.floor(Math.random() * (arr.length - 1))) % arr.length
-      : Math.floor(Math.random() * arr.length);
-    lineIdx = pick(t.lines, lineIdx);
-    sayIdx = pick(t.sayings, i === tierIdx ? sayIdx : 0);
-    tierIdx = i;
-    $("walt").dataset.mood = t.mood;
-    $("mouth").setAttribute("d", t.mouth);
-    $("quip").textContent = t.lines[lineIdx];
-    const [saying, gloss] = t.sayings[sayIdx];
-    $("saying").textContent = "“" + saying + "”";
-    $("gloss").textContent = gloss;
-    const c = $("comic"); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop");
-  }
+  if (i === tierIdx && !force) return;
+  lineIdx = force ? (lineIdx + 1) % t.lines.length : Math.floor(Math.random() * t.lines.length);
+  tierIdx = i;
+  $("walt").dataset.mood = t.mood;
+  $("mouth").setAttribute("d", t.mouth);
+  $("quip").textContent = t.lines[lineIdx];
+  const w = $("walt"); w.classList.remove("pop"); void w.getBoundingClientRect(); w.classList.add("pop");
 }
 $("comic").addEventListener("click", () => updateComic(lastTotal, true));
 
