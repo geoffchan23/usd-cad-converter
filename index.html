@@ -93,12 +93,12 @@
       <div>
         <label for="rbcFee">RBC FX fee %</label>
         <input id="rbcFee" type="text" inputmode="decimal">
-        <div class="hint">Most RBC Visas: 2.5%</div>
+        <div class="hint">0 matched your real charges</div>
       </div>
       <div>
         <label for="visaSpread">Visa spread %</label>
         <input id="visaSpread" type="text" inputmode="decimal">
-        <div class="hint">Visa vs. market rate, usually small</div>
+        <div class="hint">Visa vs. market, ~0.3%</div>
       </div>
       <div>
         <label for="tax">US sales tax %</label>
@@ -116,9 +116,10 @@
   <div class="card">
     <details>
       <summary>How this is calculated</summary>
-      <p>RBC Visa cards convert US-dollar purchases at the Visa network rate and then add a foreign
-        transaction fee (2.5% on most RBC credit cards). The market rate is loaded live and refreshed
-        daily. Visa's own published rate is usually within a few tenths of a percent of it.</p>
+      <p>US-dollar purchases are converted at the Visa network rate, which runs about 0.3% above
+        the market rate. That matched a real charge (US$15.60 → C$22.06), so no extra foreign
+        transaction fee is added by default. If your card does add one, enter it under RBC FX fee.
+        The market rate is loaded live and refreshed daily.</p>
       <p>Your exact rate is set on the day the charge posts, not the day you buy, so treat
         this as a close estimate. Check your card's terms if you're unsure of its fee. Some cards charge 0%.</p>
       <p>Your settings are saved on this phone.</p>
@@ -128,9 +129,18 @@
 
 <script>
 const $ = id => document.getElementById(id);
-const DEFAULTS = { rbcFee: "2.5", visaSpread: "0.2", tax: "0", rateOverride: "" };
+// Calibrated to a real charge: US$15.60 posted as C$22.06 with the market at ~1.410,
+// i.e. ~0.3% over market and no separate 2.5% fee in the amount charged.
+const DEFAULTS = { rbcFee: "0", visaSpread: "0.3", tax: "0", rateOverride: "" };
 const fields = Object.keys(DEFAULTS);
-const saved = JSON.parse(localStorage.getItem("fx-settings") || "{}");
+// v2 settings: carry over tax and rate override, but drop the old fee/spread
+// so phones that saved the old 2.5% default pick up the corrected one.
+if (!localStorage.getItem("fx-settings-v2")) {
+  const old = JSON.parse(localStorage.getItem("fx-settings") || "{}");
+  localStorage.setItem("fx-settings-v2", JSON.stringify({ tax: old.tax, rateOverride: old.rateOverride }));
+  localStorage.removeItem("fx-settings");
+}
+const saved = JSON.parse(localStorage.getItem("fx-settings-v2") || "{}");
 fields.forEach(f => { $(f).value = saved[f] ?? DEFAULTS[f]; });
 
 let marketRate = null;
@@ -166,7 +176,7 @@ function calc() {
 
 fields.forEach(f => $(f).addEventListener("input", () => {
   const s = {}; fields.forEach(k => s[k] = $(k).value);
-  localStorage.setItem("fx-settings", JSON.stringify(s));
+  localStorage.setItem("fx-settings-v2", JSON.stringify(s));
   calc();
 }));
 $("usd").addEventListener("input", calc);
@@ -218,7 +228,19 @@ $("usd").focus();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) loadRate(); });
 window.addEventListener("online", loadRate);
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+// Check for a new version on every launch and when the app returns to the foreground,
+// and reload once when a new service worker takes over so the update shows immediately.
+if ("serviceWorker" in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(reg => {
+    reg.update();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) reg.update(); });
+  });
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadController && !reloaded) { reloaded = true; location.reload(); }
+  });
+}
 </script>
 </body>
 </html>
