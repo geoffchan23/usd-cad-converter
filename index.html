@@ -16,121 +16,169 @@
   :root {
     --bg: #f4f6f9; --card: #fff; --text: #14181f; --muted: #6b7380;
     --line: #e3e7ee; --accent: #005DAA; --accent-soft: #e6f0fa; --warn: #b4560a;
+    --ink: #1c1c1c; --paper: #fffdf3; --dot: #f2e7c4; --shadow: #1c1c1c;
   }
   @media (prefers-color-scheme: dark) {
     :root { --bg: #0e1116; --card: #181c23; --text: #eef1f5; --muted: #98a1ae;
-      --line: #2a303a; --accent: #5aa7f0; --accent-soft: #1a2a3c; --warn: #f0a35a; }
+      --line: #2a303a; --accent: #5aa7f0; --accent-soft: #1a2a3c; --warn: #f0a35a;
+      --paper: #f6f0dc; --dot: #e6d9ad; --shadow: #3d4656; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg); color: var(--text);
-    padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+    padding: max(14px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
   main { max-width: 460px; margin: 0 auto; }
-  h1 { font-size: 20px; margin: 4px 0 2px; }
-  .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
-  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  h1 { font-size: 15px; font-weight: 600; color: var(--muted); margin: 2px 0 10px; text-align: center; }
+
+  /* Input + result: one card, the whole point of the app */
+  .hero { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 14px; margin-bottom: 14px; }
   .amount { display: flex; align-items: center; gap: 8px; border: 2px solid var(--accent);
-    border-radius: 12px; padding: 4px 12px; }
-  .amount span { font-size: 28px; color: var(--muted); }
+    border-radius: 14px; padding: 2px 14px; }
+  .amount span { font-size: 30px; color: var(--muted); }
   .amount input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text);
-    font-size: 36px; font-weight: 600; padding: 6px 0; }
-  .amount small { font-weight: 600; color: var(--muted); }
-  .total { background: var(--accent-soft); border-color: transparent; text-align: center; }
-  .total .big { font-size: 44px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
-  .total .eff { color: var(--muted); font-size: 14px; }
-  .row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 15px; }
+    font-size: 40px; font-weight: 600; padding: 6px 0; }
+  .amount small { font-weight: 700; color: var(--muted); }
+  .result { text-align: center; padding: 14px 0 2px; }
+  .result .big { font-size: 52px; font-weight: 800; color: var(--accent); letter-spacing: -1px; line-height: 1.05;
+    font-variant-numeric: tabular-nums; }
+  .result .big small { font-size: 20px; font-weight: 700; letter-spacing: 0; color: var(--muted); }
+  .result .eff { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .result .eff.err { color: var(--warn); }
+
+  /* The comic */
+  .comic { position: relative; background: var(--paper); border: 3px solid var(--ink); border-radius: 6px;
+    box-shadow: 5px 5px 0 var(--shadow); margin: 6px 4px 22px; padding: 12px 12px 10px; color: var(--ink);
+    background-image: radial-gradient(var(--dot) 1.2px, transparent 1.3px); background-size: 9px 9px;
+    font-family: "Chalkboard SE", "Comic Neue", "Comic Sans MS", "Marker Felt", ui-rounded, sans-serif;
+    cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .comic .tag { position: absolute; top: -12px; left: 12px; background: #ffd23f; border: 2px solid var(--ink);
+    font-size: 11px; font-weight: 700; letter-spacing: .5px; padding: 1px 8px; text-transform: uppercase; transform: rotate(-2deg); }
+  .comic .scene { display: flex; align-items: flex-end; gap: 6px; }
+  .comic svg { width: 116px; flex: none; overflow: visible; }
+  .bubble { position: relative; flex: 1; background: #fff; border: 2.5px solid var(--ink); border-radius: 18px;
+    padding: 10px 12px; font-size: 17px; font-weight: 700; line-height: 1.25; margin-bottom: 46px; min-height: 58px; }
+  .bubble::before, .bubble::after { content: ""; position: absolute; left: -14px; bottom: 10px;
+    border-style: solid; border-width: 8px 16px 8px 0; border-color: transparent var(--ink) transparent transparent; }
+  .bubble::after { left: -9.5px; bottom: 11.5px; border-width: 6.5px 13px 6.5px 0; border-color: transparent #fff transparent transparent; }
+  .caption { border-top: 2px dashed var(--ink); margin-top: 6px; padding-top: 6px; font-size: 13px; text-align: center; min-height: 1.3em; }
+  .reroll { position: absolute; right: 8px; bottom: -20px; font-size: 11px; color: var(--muted); font-family: inherit; }
+
+  /* Wallet moods */
+  #walt .eyes > g, #walt .sweat, #walt .zzz, #walt .bill-fly { display: none; }
+  #walt[data-mood="sleep"] .e-closed, #walt[data-mood="sleep"] .zzz { display: inline; }
+  #walt[data-mood="happy"] .e-happy { display: inline; }
+  #walt[data-mood="side"] .e-side { display: inline; }
+  #walt[data-mood="nervous"] .e-open, #walt[data-mood="nervous"] .s1 { display: inline; }
+  #walt[data-mood="panic"] .e-wide, #walt[data-mood="panic"] .sweat { display: inline; }
+  #walt[data-mood="dead"] .e-x, #walt[data-mood="dead"] .bill-fly { display: inline; }
+  #walt[data-mood="dead"] .bill { display: none; }
+  #walt[data-mood="panic"] .body { animation: shake .35s infinite; transform-origin: 60px 80px; }
+  #walt[data-mood="sleep"] .body { animation: breathe 3s ease-in-out infinite; transform-origin: 60px 95px; }
+  #walt .bill-fly { animation: fly 1.6s ease-in infinite; }
+  .pop { animation: pop .3s ease-out; }
+  @keyframes shake { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-3deg) } 75% { transform: rotate(3deg) } }
+  @keyframes breathe { 0%,100% { transform: scaleY(1) } 50% { transform: scaleY(.97) } }
+  @keyframes fly { 0% { transform: translate(0,0) rotate(0); opacity: 1 } 100% { transform: translate(40px,-60px) rotate(40deg); opacity: 0 } }
+  @keyframes pop { 0% { transform: scale(.92) } 60% { transform: scale(1.03) } 100% { transform: scale(1) } }
+  @media (prefers-reduced-motion: reduce) { #walt * , .pop { animation: none !important; } }
+
+  /* Details (everything that isn't the core flow) */
+  details.more { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+  details.more summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); list-style: none; text-align: center; }
+  details.more summary::-webkit-details-marker { display: none; }
+  details.more[open] summary { margin-bottom: 8px; }
+  .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
   .row + .row { border-top: 1px solid var(--line); }
   .row .k { color: var(--muted); }
   .row .v { font-variant-numeric: tabular-nums; font-weight: 500; }
-  .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .settings input { width: 100%; font-size: 17px; padding: 10px; border-radius: 10px;
+  .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .settings label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .settings input { width: 100%; font-size: 17px; padding: 8px 10px; border-radius: 10px;
     border: 1px solid var(--line); background: var(--bg); color: var(--text); }
-  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .status { font-size: 12px; color: var(--muted); text-align: center; margin: 4px 0 12px; }
-  .status.err { color: var(--warn); }
-  details summary { cursor: pointer; font-weight: 600; font-size: 15px; }
-  details p { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
-  button { font: inherit; }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .chips button { border: 1px solid var(--line); background: var(--bg); color: var(--text);
-    border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .note { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
 </style>
 </head>
 <body>
 <main>
   <h1>USD → CAD on RBC Visa</h1>
-  <div class="sub">What a US-dollar price actually costs on your RBC Visa card</div>
 
-  <div class="card">
-    <label for="usd">Price in US dollars</label>
-    <div class="amount">
+  <div class="hero">
+    <label class="amount" for="usd">
       <span>$</span>
-      <input id="usd" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+      <input id="usd" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" aria-label="Price in US dollars">
       <small>USD</small>
+    </label>
+    <div class="result">
+      <div class="big"><span id="total">$0.00</span> <small>CAD</small></div>
+      <div class="eff" id="status">Loading today's rate…</div>
     </div>
-    <div class="chips" id="chips"></div>
   </div>
 
-  <div class="card total">
-    <div class="eff">You'll actually pay about</div>
-    <div class="big" id="total">$0.00</div>
-    <div class="eff" id="effRate">CAD</div>
+  <div class="comic" id="comic" role="button" aria-label="Wallet commentary, tap for another line">
+    <div class="tag">Your wallet says</div>
+    <div class="scene">
+      <svg id="walt" data-mood="sleep" viewBox="0 0 120 110" aria-hidden="true">
+        <g class="body">
+          <g class="bill"><rect x="26" y="20" width="56" height="26" rx="2" fill="#7fc47f" stroke="#1c1c1c" stroke-width="2.5"/>
+            <circle cx="54" cy="33" r="6" fill="none" stroke="#1c1c1c" stroke-width="2"/></g>
+          <rect x="8" y="34" width="104" height="68" rx="12" fill="#a5672f" stroke="#1c1c1c" stroke-width="3"/>
+          <path d="M8 52 H112" stroke="#1c1c1c" stroke-width="2.5" stroke-dasharray="5 4" opacity=".5"/>
+          <rect x="88" y="58" width="24" height="16" rx="5" fill="#c98a4b" stroke="#1c1c1c" stroke-width="2.5"/>
+          <circle cx="97" cy="66" r="3" fill="#ffd23f" stroke="#1c1c1c" stroke-width="1.5"/>
+          <g class="eyes" stroke="#1c1c1c" stroke-width="3" stroke-linecap="round" fill="none">
+            <g class="e-closed"><path d="M30 68 q7 5 14 0"/><path d="M56 68 q7 5 14 0"/></g>
+            <g class="e-happy"><path d="M30 70 q7 -8 14 0"/><path d="M56 70 q7 -8 14 0"/></g>
+            <g class="e-side"><path d="M29 64 h16"/><path d="M55 64 h16"/>
+              <circle cx="41" cy="68" r="3.5" fill="#1c1c1c"/><circle cx="67" cy="68" r="3.5" fill="#1c1c1c"/></g>
+            <g class="e-open"><circle cx="37" cy="67" r="6" fill="#fff"/><circle cx="63" cy="67" r="6" fill="#fff"/>
+              <circle cx="37" cy="68" r="2.5" fill="#1c1c1c"/><circle cx="63" cy="68" r="2.5" fill="#1c1c1c"/>
+              <path d="M30 59 l12 -4"/><path d="M70 59 l-12 -4"/></g>
+            <g class="e-wide"><circle cx="37" cy="66" r="9" fill="#fff"/><circle cx="63" cy="66" r="9" fill="#fff"/>
+              <circle cx="37" cy="66" r="2" fill="#1c1c1c"/><circle cx="63" cy="66" r="2" fill="#1c1c1c"/></g>
+            <g class="e-x"><path d="M31 61 l12 12 M43 61 l-12 12"/><path d="M57 61 l12 12 M69 61 l-12 12"/></g>
+          </g>
+          <path id="mouth" d="M44 86 h12" stroke="#1c1c1c" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path class="sweat s1" d="M16 58 q-5 9 0 11 q5 -2 0 -11z" fill="#7cc6ff" stroke="#1c1c1c" stroke-width="1.5"/>
+          <path class="sweat" d="M80 44 q-5 9 0 11 q5 -2 0 -11z" fill="#7cc6ff" stroke="#1c1c1c" stroke-width="1.5"/>
+        </g>
+        <g class="bill-fly"><rect x="30" y="16" width="44" height="20" rx="2" fill="#7fc47f" stroke="#1c1c1c" stroke-width="2.5"/>
+          <path d="M18 22 q4 -6 8 0 M74 10 q4 -6 8 0" stroke="#1c1c1c" stroke-width="2" fill="none"/></g>
+        <text class="zzz" x="88" y="26" font-size="16" font-weight="700" fill="#1c1c1c">z<tspan dx="2" dy="-8" font-size="20">Z</tspan></text>
+      </svg>
+      <div class="bubble" id="quip">Zzz…</div>
+    </div>
+    <div class="caption" id="caption">&nbsp;</div>
+    <div class="reroll">tap for another</div>
   </div>
-  <div class="status" id="status">Loading today's rate…</div>
 
-  <div class="card">
+  <details class="more">
+    <summary>Details &amp; settings</summary>
     <div class="row"><span class="k">US price</span><span class="v" id="bUsd">—</span></div>
     <div class="row"><span class="k">+ US sales tax</span><span class="v" id="bTax">—</span></div>
     <div class="row"><span class="k">At market rate</span><span class="v" id="bMid">—</span></div>
     <div class="row"><span class="k">+ Visa rate spread</span><span class="v" id="bVisa">—</span></div>
-    <div class="row"><span class="k">+ RBC foreign transaction fee</span><span class="v" id="bRbc">—</span></div>
+    <div class="row"><span class="k">+ RBC FX fee</span><span class="v" id="bRbc">—</span></div>
     <div class="row"><span class="k"><b>Total in CAD</b></span><span class="v"><b id="bTotal">—</b></span></div>
-  </div>
-
-  <div class="card">
     <div class="settings">
-      <div>
-        <label for="rbcFee">RBC FX fee %</label>
-        <input id="rbcFee" type="text" inputmode="decimal">
-        <div class="hint">0 matched your real charges</div>
-      </div>
-      <div>
-        <label for="visaSpread">Visa spread %</label>
-        <input id="visaSpread" type="text" inputmode="decimal">
-        <div class="hint">Visa vs. market, ~0.3%</div>
-      </div>
-      <div>
-        <label for="tax">US sales tax %</label>
-        <input id="tax" type="text" inputmode="decimal">
-        <div class="hint">0 if price already includes it</div>
-      </div>
-      <div>
-        <label for="rateOverride">Rate override</label>
-        <input id="rateOverride" type="text" inputmode="decimal" placeholder="auto">
-        <div class="hint">Blank = live market rate</div>
-      </div>
+      <div><label for="tax">US sales tax %</label><input id="tax" type="text" inputmode="decimal">
+        <div class="hint">0 if price includes it</div></div>
+      <div><label for="visaSpread">Visa spread %</label><input id="visaSpread" type="text" inputmode="decimal">
+        <div class="hint">~0.3% over market</div></div>
+      <div><label for="rbcFee">RBC FX fee %</label><input id="rbcFee" type="text" inputmode="decimal">
+        <div class="hint">0 matched your real charges</div></div>
+      <div><label for="rateOverride">Rate override</label><input id="rateOverride" type="text" inputmode="decimal" placeholder="auto">
+        <div class="hint">Blank = live rate</div></div>
     </div>
-  </div>
-
-  <div class="card">
-    <details>
-      <summary>How this is calculated</summary>
-      <p>US-dollar purchases are converted at the Visa network rate, which runs about 0.3% above
-        the market rate. That matched a real charge (US$15.60 → C$22.06), so no extra foreign
-        transaction fee is added by default. If your card does add one, enter it under RBC FX fee.
-        The market rate is loaded live and refreshed daily.</p>
-      <p>Your exact rate is set on the day the charge posts, not the day you buy, so treat
-        this as a close estimate. Check your card's terms if you're unsure of its fee. Some cards charge 0%.</p>
-      <p>Your settings are saved on this phone.</p>
-    </details>
-  </div>
+    <p class="note">US purchases convert at Visa's rate, about 0.3% above the market rate, with no extra fee
+      on your card (checked against real statement charges). Visa sets the rate on the day the charge is processed,
+      which can be a day or two after you buy, so expect up to about half a percent of drift. Settings are saved on this phone.</p>
+  </details>
 </main>
 
 <script>
 const $ = id => document.getElementById(id);
-// Calibrated to a real charge: US$15.60 posted as C$22.06 with the market at ~1.410,
-// i.e. ~0.3% over market and no separate 2.5% fee in the amount charged.
+// Calibrated to real charges: ~0.3% over market and no separate 2.5% fee in the amount charged.
 const DEFAULTS = { rbcFee: "0", visaSpread: "0.3", tax: "0", rateOverride: "" };
 const fields = Object.keys(DEFAULTS);
 // v2 settings: carry over tax and rate override, but drop the old fee/spread
@@ -148,30 +196,93 @@ const num = v => { const n = parseFloat(String(v).replace(/[^0-9.]/g, "")); retu
 const cad = n => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const usd = n => "US$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+// ---- The wallet's opinions, by how much CAD is about to leave ----
+const TIERS = [
+  { max: 0, mood: "sleep", mouth: "M50 88 h10", lines: [
+    "Zzz… wake me when you find something to buy.",
+    "Type a price. I'll be here. Judging.",
+    "Ah, the calm before the checkout." ] },
+  { max: 15, mood: "happy", mouth: "M46 84 q10 9 20 0", lines: [
+    "Cute. Go for it.",
+    "That's a snack, not a decision.",
+    "Fine. Treat yourself. Modestly.",
+    "I barely felt that." ] },
+  { max: 75, mood: "side", mouth: "M46 88 q8 -4 18 -2", lines: [
+    "Do you need it, or did an ad tell you that?",
+    "Will you remember this purchase next week?",
+    "Sure. It's not like the loonie's going through anything.",
+    "Is it on sale, or does it just look like it's on sale?" ] },
+  { max: 250, mood: "nervous", mouth: "M44 88 q4 -4 8 0 q4 4 8 0 q4 -4 8 0", lines: [
+    "Bold. Your future self has been cc'd.",
+    "Have you tried wanting it less?",
+    "Sleep on it. The cart will still be there. Probably.",
+    "Remember when we were saving? Good times." ] },
+  { max: 1000, mood: "panic", mouth: "M47 86 a8 7 0 1 0 16 0 a8 7 0 1 0 -16 0", lines: [
+    "Put. The phone. Down.",
+    "This is how it starts. First one cart, then a second cart.",
+    "I've seen our statements. Please.",
+    "Is this an emergency? Like, a real one?" ] },
+  { max: Infinity, mood: "dead", mouth: "M44 90 h22", lines: [
+    "I'm not mad. I'm just… empty.",
+    "Tell my coins I loved them.",
+    "Okay, now you're just doing this to hurt me.",
+    "Remember me as I was: full." ] },
+];
+// Rough Canadian price yardsticks, for perspective. "About", not accounting.
+const YARDSTICKS = [
+  { upTo: 40, price: 2.4, one: "double-double", many: "double-doubles" },
+  { upTo: 400, price: 13, one: "poutine", many: "poutines" },
+  { upTo: Infinity, price: 85, one: "tank of gas", many: "tanks of gas" },
+];
+let tierIdx = -1, lineIdx = 0;
+
+function updateComic(total, force) {
+  const i = TIERS.findIndex(t => total <= t.max);
+  const t = TIERS[i];
+  if (i !== tierIdx || force) {
+    lineIdx = force ? (lineIdx + 1 + Math.floor(Math.random() * (t.lines.length - 1))) % t.lines.length
+                    : Math.floor(Math.random() * t.lines.length);
+    tierIdx = i;
+    $("walt").dataset.mood = t.mood;
+    $("mouth").setAttribute("d", t.mouth);
+    $("quip").textContent = t.lines[lineIdx];
+    const c = $("comic"); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop");
+  }
+  if (total > 0) {
+    const y = YARDSTICKS.find(y => total <= y.upTo);
+    const n = total / y.price;
+    const shown = n < 10 ? Math.round(n * 10) / 10 : Math.round(n);
+    $("caption").textContent = `That's about ${shown} ${shown === 1 ? y.one : y.many}.`;
+  } else {
+    $("caption").textContent = "Currently spending: nothing. Love that for us.";
+  }
+}
+$("comic").addEventListener("click", () => updateComic(lastTotal, true));
+
+let lastTotal = 0;
 function calc() {
   const override = num($("rateOverride").value);
   const mid = override > 0 ? override : marketRate;
   const price = num($("usd").value);
   const taxPct = num($("tax").value), visaPct = num($("visaSpread").value), rbcPct = num($("rbcFee").value);
-
   const taxUsd = price * taxPct / 100;
   const subUsd = price + taxUsd;
-  if (!mid) return;
+  if (!mid) { updateComic(0); return; }
   const atMid = subUsd * mid;
   const visaRate = mid * (1 + visaPct / 100);
   const atVisa = subUsd * visaRate;
   const rbc = atVisa * rbcPct / 100;
   const total = atVisa + rbc;
-  const effRate = visaRate * (1 + rbcPct / 100);
+  lastTotal = total;
 
   $("total").textContent = cad(total);
-  $("effRate").textContent = `CAD · effective rate ${effRate.toFixed(4)} (market ${mid.toFixed(4)})`;
   $("bUsd").textContent = usd(price);
   $("bTax").textContent = usd(taxUsd);
   $("bMid").textContent = cad(atMid);
   $("bVisa").textContent = cad(atVisa - atMid);
   $("bRbc").textContent = cad(rbc);
   $("bTotal").textContent = cad(total);
+  updateComic(total);
 }
 
 fields.forEach(f => $(f).addEventListener("input", () => {
@@ -181,12 +292,11 @@ fields.forEach(f => $(f).addEventListener("input", () => {
 }));
 $("usd").addEventListener("input", calc);
 
-[10, 25, 50, 100, 250].forEach(v => {
-  const b = document.createElement("button");
-  b.textContent = "$" + v;
-  b.onclick = () => { $("usd").value = v; calc(); };
-  $("chips").appendChild(b);
-});
+function rateLine(mid, extra) {
+  const visaPct = num($("visaSpread").value), rbcPct = num($("rbcFee").value);
+  const eff = mid * (1 + visaPct / 100) * (1 + rbcPct / 100);
+  return `1 USD → ${eff.toFixed(4)} CAD on your card` + (extra ? ` · ${extra}` : "");
+}
 
 async function loadRate() {
   const sources = [
@@ -204,9 +314,9 @@ async function loadRate() {
       const { rate, when } = await src();
       if (rate > 0) {
         marketRate = rate;
-        $("status").classList.remove("err");
         localStorage.setItem("fx-last", JSON.stringify({ rate, when }));
-        $("status").textContent = `Market rate 1 USD = ${rate.toFixed(4)} CAD · updated ${when.toLocaleString("en-CA", { dateStyle: "medium", timeStyle: "short" })}`;
+        $("status").classList.remove("err");
+        $("status").textContent = rateLine(rate, `market ${rate.toFixed(4)}`);
         calc(); return;
       }
     } catch (e) { /* try next source */ }
@@ -214,13 +324,14 @@ async function loadRate() {
   const last = JSON.parse(localStorage.getItem("fx-last") || "null");
   if (last) {
     marketRate = last.rate;
-    $("status").textContent = `Offline: using last saved rate ${last.rate.toFixed(4)} from ${new Date(last.when).toLocaleDateString("en-CA")}`;
+    $("status").textContent = rateLine(last.rate, `offline, rate from ${new Date(last.when).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}`);
   } else {
-    $("status").textContent = "Couldn't load the rate. Enter one under Rate override.";
+    $("status").textContent = "Couldn't load the rate. Set one under Details & settings.";
   }
   $("status").classList.add("err");
   calc();
 }
+updateComic(0);
 loadRate();
 $("usd").focus();
 
