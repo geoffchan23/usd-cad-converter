@@ -116,7 +116,7 @@
   </div>
 
   <div class="comic" id="comic" role="button" aria-label="Wallet commentary, tap for another line">
-    <div class="tag">Your wallet says</div>
+    <div class="tag">Yuh wallet seh</div>
     <div class="scene">
       <svg id="walt" data-mood="sleep" viewBox="0 0 120 110" aria-hidden="true">
         <g class="body">
@@ -149,7 +149,7 @@
       <div class="bubble" id="quip">Zzz…</div>
     </div>
     <div class="caption" id="caption">&nbsp;</div>
-    <div class="reroll">tap for another</div>
+    <div class="reroll">tap fuh anodda one</div>
   </div>
 
   <details class="more">
@@ -196,43 +196,43 @@ const num = v => { const n = parseFloat(String(v).replace(/[^0-9.]/g, "")); retu
 const cad = n => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const usd = n => "US$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// ---- The wallet's opinions, by how much CAD is about to leave ----
+// ---- The wallet's opinions (in Guyanese Creolese), by how much CAD is about to leave ----
 const TIERS = [
   { max: 0, mood: "sleep", mouth: "M50 88 h10", lines: [
-    "Zzz… wake me when you find something to buy.",
-    "Type a price. I'll be here. Judging.",
-    "Ah, the calm before the checkout." ] },
+    "Zzz… wake me up when yuh find sumting fuh buy.",
+    "Me jus' restin' me eye. Me still watchin' yuh.",
+    "Everyting quiet. Me like it so." ] },
   { max: 15, mood: "happy", mouth: "M46 84 q10 9 20 0", lines: [
-    "Cute. Go for it.",
-    "That's a snack, not a decision.",
-    "Fine. Treat yourself. Modestly.",
-    "I barely felt that." ] },
+    "Small ting. Go 'head.",
+    "Dat is lil change. Me nah vex.",
+    "Alright, treat yuhself. But lil bit, yuh hear?",
+    "Me barely feel dat." ] },
   { max: 75, mood: "side", mouth: "M46 88 q8 -4 18 -2", lines: [
-    "Do you need it, or did an ad tell you that?",
-    "Will you remember this purchase next week?",
-    "Sure. It's not like the loonie's going through anything.",
-    "Is it on sale, or does it just look like it's on sale?" ] },
+    "*cut eye* Yuh really need dat?",
+    "Steups. Is wuh yuh buyin' now?",
+    "Is need yuh need it, or ad tell yuh fuh buy it?",
+    "Hmm. Yuh gon even remember dis next week?" ] },
   { max: 250, mood: "nervous", mouth: "M44 88 q4 -4 8 0 q4 4 8 0 q4 -4 8 0", lines: [
-    "Bold. Your future self has been cc'd.",
-    "Have you tried wanting it less?",
-    "Sleep on it. The cart will still be there. Probably.",
-    "Remember when we were saving? Good times." ] },
+    "Eh-eh! Money nah grow pan tree, yuh know.",
+    "Tek time, nuh. Sleep pan it.",
+    "Remember when abee was savin'? Dem was good days.",
+    "Yuh future self gon cuss yuh fuh dis." ] },
   { max: 1000, mood: "panic", mouth: "M47 86 a8 7 0 1 0 16 0 a8 7 0 1 0 -16 0", lines: [
-    "Put. The phone. Down.",
-    "This is how it starts. First one cart, then a second cart.",
-    "I've seen our statements. Please.",
-    "Is this an emergency? Like, a real one?" ] },
+    "Oh gawd! Put down de phone!",
+    "Yuh mad or wha?!",
+    "Me nah able wid yuh!",
+    "Is emergency? Like, real real emergency?" ] },
   { max: Infinity, mood: "dead", mouth: "M44 90 h22", lines: [
-    "I'm not mad. I'm just… empty.",
-    "Tell my coins I loved them.",
-    "Okay, now you're just doing this to hurt me.",
-    "Remember me as I was: full." ] },
+    "Wuh fuh do. Me done.",
+    "Tell me coins me did love dem.",
+    "Me gon tell yuh mudda.",
+    "Yuh pockets nah deep so, yuh know." ] },
 ];
-// Rough Canadian price yardsticks, for perspective. "About", not accounting.
+// Rough Guyanese-food yardsticks in CAD, for perspective. "Bout", not accounting.
 const YARDSTICKS = [
-  { upTo: 40, price: 2.4, one: "double-double", many: "double-doubles" },
-  { upTo: 400, price: 13, one: "poutine", many: "poutines" },
-  { upTo: Infinity, price: 85, one: "tank of gas", many: "tanks of gas" },
+  { upTo: 40, price: 2.5, name: "pine tart" },
+  { upTo: 400, price: 15, name: "roti and curry" },
+  { upTo: Infinity, price: 90, name: "pot a pepperpot" },
 ];
 let tierIdx = -1, lineIdx = 0;
 
@@ -252,9 +252,9 @@ function updateComic(total, force) {
     const y = YARDSTICKS.find(y => total <= y.upTo);
     const n = total / y.price;
     const shown = n < 10 ? Math.round(n * 10) / 10 : Math.round(n);
-    $("caption").textContent = `That's about ${shown} ${shown === 1 ? y.one : y.many}.`;
+    $("caption").textContent = `Dat is bout ${shown} ${y.name}.`;
   } else {
-    $("caption").textContent = "Currently spending: nothing. Love that for us.";
+    $("caption").textContent = "Right now yuh spendin' nutten. Me like dat.";
   }
 }
 $("comic").addEventListener("click", () => updateComic(lastTotal, true));
