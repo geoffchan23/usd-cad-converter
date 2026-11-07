@@ -60,7 +60,9 @@
   .bubble::before, .bubble::after { content: ""; position: absolute; left: -14px; bottom: 10px;
     border-style: solid; border-width: 8px 16px 8px 0; border-color: transparent var(--ink) transparent transparent; }
   .bubble::after { left: -9.5px; bottom: 11.5px; border-width: 6.5px 13px 6.5px 0; border-color: transparent #fff transparent transparent; }
-  .caption { border-top: 2px dashed var(--ink); margin-top: 6px; padding-top: 6px; font-size: 13px; text-align: center; min-height: 1.3em; }
+  .caption { border-top: 2px dashed var(--ink); margin-top: 6px; padding-top: 7px; text-align: center; }
+  .caption .saying { font-size: 15px; font-weight: 700; font-style: italic; }
+  .caption .gloss { font-size: 12px; opacity: .65; margin-top: 2px; }
   .reroll { position: absolute; right: 8px; bottom: -20px; font-size: 11px; color: var(--muted); font-family: inherit; }
 
   /* Wallet moods */
@@ -148,7 +150,7 @@
       </svg>
       <div class="bubble" id="quip">Zzz…</div>
     </div>
-    <div class="caption" id="caption">&nbsp;</div>
+    <div class="caption"><div class="saying" id="saying">&nbsp;</div><div class="gloss" id="gloss"></div></div>
     <div class="reroll">tap fuh anodda one</div>
   </div>
 
@@ -197,64 +199,73 @@ const cad = n => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, max
 const usd = n => "US$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 // ---- The wallet's opinions (in Guyanese Creolese), by how much CAD is about to leave ----
+// Each tier: what the wallet says, plus a real Guyanese proverb for the caption.
 const TIERS = [
   { max: 0, mood: "sleep", mouth: "M50 88 h10", lines: [
     "Zzz… wake me up when yuh find sumting fuh buy.",
     "Me jus' restin' me eye. Me still watchin' yuh.",
-    "Everyting quiet. Me like it so." ] },
+    "Everyting quiet. Me like it so." ], sayings: [
+    ["Cold water does cool hot iron.", "Give it time and the wanting passes."],
+    ["Tek yuh eye an pass.", "Just look. Don't buy."] ] },
   { max: 15, mood: "happy", mouth: "M46 84 q10 9 20 0", lines: [
     "Small ting. Go 'head.",
     "Dat is lil change. Me nah vex.",
     "Alright, treat yuhself. But lil bit, yuh hear?",
-    "Me barely feel dat." ] },
+    "Me barely feel dat." ], sayings: [
+    ["One one dutty does mek dam.", "Little purchases add up."],
+    ["Good livin nah long life.", "Comfort isn't the same as wisdom."] ] },
   { max: 75, mood: "side", mouth: "M46 88 q8 -4 18 -2", lines: [
     "*cut eye* Yuh really need dat?",
     "Steups. Is wuh yuh buyin' now?",
     "Is need yuh need it, or ad tell yuh fuh buy it?",
-    "Hmm. Yuh gon even remember dis next week?" ] },
+    "Tek yuh eye an pass, nuh." ], sayings: [
+    ["All skin teeth nah laugh.", "That “sale” smiling at you is not your friend."],
+    ["Empty barrel mek de most noise.", "The loudest ads have the least behind them."],
+    ["Cat foot soft but he does scratch hard.", "Looks harmless. Hits the statement hard."] ] },
   { max: 250, mood: "nervous", mouth: "M44 88 q4 -4 8 0 q4 4 8 0 q4 -4 8 0", lines: [
     "Eh-eh! Money nah grow pan tree, yuh know.",
-    "Tek time, nuh. Sleep pan it.",
+    "Yuh hard ears, eh? Me done tell yuh.",
     "Remember when abee was savin'? Dem was good days.",
-    "Yuh future self gon cuss yuh fuh dis." ] },
+    "Yuh future self gon cuss yuh fuh dis." ], sayings: [
+    ["Nah put all two foot in di river if yuh want see how deep.", "Test the waters before you commit."],
+    ["When ya hand in lion mouth, tek time draw it out.", "Careful now. Back away slowly."],
+    ["If you nah hear, you guh feel.", "Ignore the warning, feel the statement."] ] },
   { max: 1000, mood: "panic", mouth: "M47 86 a8 7 0 1 0 16 0 a8 7 0 1 0 -16 0", lines: [
-    "Oh gawd! Put down de phone!",
+    "Ow man! Put down de phone!",
     "Yuh mad or wha?!",
-    "Me nah able wid yuh!",
-    "Is emergency? Like, real real emergency?" ] },
+    "Mi nah able wid yuh!",
+    "Look how yuh hungish!" ], sayings: [
+    ["Wanti all, getti none.", "Grab for everything, end up with nothing."],
+    ["Yuh diggin hole to fill hole.", "Credit card logic."],
+    ["Wha sweet ah goat mouth does sour he backside.", "Sweet now, bitter when the bill comes."] ] },
   { max: Infinity, mood: "dead", mouth: "M44 90 h22", lines: [
     "Wuh fuh do. Me done.",
-    "Tell me coins me did love dem.",
+    "Ah deh ya… barely.",
     "Me gon tell yuh mudda.",
-    "Yuh pockets nah deep so, yuh know." ] },
+    "Leff am. Jus' leff am." ], sayings: [
+    ["After laugh come cry.", "Fun at checkout, tears at the statement."],
+    ["“If meh bin know” always deh behind di door.", "“I didn't know” won't save you now."],
+    ["Yuh gon learn, either in joke or in cry.", "This one's the cry."] ] },
 ];
-// Rough Guyanese-food yardsticks in CAD, for perspective. "Bout", not accounting.
-const YARDSTICKS = [
-  { upTo: 40, price: 2.5, name: "pine tart" },
-  { upTo: 400, price: 15, name: "roti and curry" },
-  { upTo: Infinity, price: 90, name: "pot a pepperpot" },
-];
-let tierIdx = -1, lineIdx = 0;
+let tierIdx = -1, lineIdx = 0, sayIdx = 0;
 
 function updateComic(total, force) {
   const i = TIERS.findIndex(t => total <= t.max);
   const t = TIERS[i];
   if (i !== tierIdx || force) {
-    lineIdx = force ? (lineIdx + 1 + Math.floor(Math.random() * (t.lines.length - 1))) % t.lines.length
-                    : Math.floor(Math.random() * t.lines.length);
+    const pick = (arr, prev) => force && arr.length > 1
+      ? (prev + 1 + Math.floor(Math.random() * (arr.length - 1))) % arr.length
+      : Math.floor(Math.random() * arr.length);
+    lineIdx = pick(t.lines, lineIdx);
+    sayIdx = pick(t.sayings, i === tierIdx ? sayIdx : 0);
     tierIdx = i;
     $("walt").dataset.mood = t.mood;
     $("mouth").setAttribute("d", t.mouth);
     $("quip").textContent = t.lines[lineIdx];
+    const [saying, gloss] = t.sayings[sayIdx];
+    $("saying").textContent = "“" + saying + "”";
+    $("gloss").textContent = gloss;
     const c = $("comic"); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop");
-  }
-  if (total > 0) {
-    const y = YARDSTICKS.find(y => total <= y.upTo);
-    const n = total / y.price;
-    const shown = n < 10 ? Math.round(n * 10) / 10 : Math.round(n);
-    $("caption").textContent = `Dat is bout ${shown} ${y.name}.`;
-  } else {
-    $("caption").textContent = "Right now yuh spendin' nutten. Me like dat.";
   }
 }
 $("comic").addEventListener("click", () => updateComic(lastTotal, true));
